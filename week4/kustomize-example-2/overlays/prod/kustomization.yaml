@@ -1,0 +1,79 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+resources:
+  - ../../base
+
+namespace: prod
+
+images:
+  - name: lyzhang1999/result
+    newTag: env
+  - name: lyzhang1999/vote
+    newTag: env
+  - name: lyzhang1999/worker
+    newTag: env
+
+# 使用 patchs 修改镜像版本，效果同 images 字段
+
+# patches:
+#   - patch: |-
+#       - op: replace
+#         path: /spec/template/spec/containers/0/image
+#         value: lyzhang1999/vote:env
+#     target:
+#       kind: Deployment
+#       name: vote
+#   - patch: |-
+#       - op: replace
+#         path: /spec/template/spec/containers/0/image
+#         value: lyzhang1999/result:env
+#     target:
+#       kind: Deployment
+#       name: result
+#   - patch: |-
+#       - op: replace
+#         path: /spec/template/spec/containers/0/image
+#         value: lyzhang1999/worker:env
+#     target:
+#       kind: Deployment
+#       name: worker
+
+secretGenerator:
+  - name: result-db-secret
+    files:
+      - .env=.env
+  - name: worker-db-secret
+    envs:
+      - .env
+
+configMapGenerator:
+  - name: vote-configmap
+    literals:
+      - OPTION_A=InfoQ
+      - OPTION_B=GeekBang
+      - REDIS_HOST=redis-master
+
+helmCharts:
+  - name: redis
+    version: "17.16.0"
+    # 暂不支持 OCI，使用传统的 Helm Repository：https://github.com/kubernetes-sigs/kustomize/pull/5167
+    repo: "https://charts.bitnami.com/bitnami"
+    namespace: dev
+    valuesInline:
+      fullnameOverride: redis
+      auth:
+        enabled: false
+  - name: postgresql-ha
+    version: "11.9.0"
+    repo: "https://charts.bitnami.com/bitnami"
+    namespace: dev
+    valuesInline:
+      fullnameOverride: db
+      global:
+        postgresql:
+          username: postgres
+          password: postgres
+          database: postgres
+          repmgrUsername: postgres
+          repmgrPassword: postgres
