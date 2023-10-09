@@ -1,0 +1,29 @@
+apiVersion: tf.upbound.io/v1beta1
+kind: ProviderConfig
+metadata:
+  name: default
+spec:
+  configuration: |
+    terraform {
+      required_providers {
+        tencentcloud = {
+          source = "tencentcloudstack/tencentcloud"
+        }
+      }
+    }
+
+    provider "tencentcloud" {
+      # edit me
+      secret_id  = ""
+      secret_key = ""
+      region     = "ap-hongkong"
+    }
+
+    // Modules _must_ use remote state. The provider does not persist state.
+    terraform {
+      backend "kubernetes" {
+        secret_suffix     = "providerconfig-default"
+        namespace         = "crossplane-system"
+        in_cluster_config = true
+      }
+    }

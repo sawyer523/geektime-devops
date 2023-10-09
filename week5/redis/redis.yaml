@@ -1,0 +1,13 @@
+apiVersion: redis.tencentcloud.crossplane.io/v1alpha1
+kind: Instance
+metadata:
+  name: redis
+spec:
+  forProvider:
+    availabilityZone: ap-hongkong-2
+    memSize: 1024
+    noAuth: true
+    chargeType: "POSTPAID"
+    subnetId: subnet-qsy4x7bh
+    typeId: 15
+    vpcId: vpc-o6t2ek0k

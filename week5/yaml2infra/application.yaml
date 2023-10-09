@@ -1,0 +1,14 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: yamltoinfra
+  namespace: argocd
+spec:
+  project: default
+  source:
+    repoURL: https://github.com/sawyer523/geektime-devops.git
+    targetRevision: HEAD
+    path: week5/yaml2infra
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: yaml2infra
