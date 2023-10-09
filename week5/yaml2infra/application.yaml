@@ -8,7 +8,7 @@ spec:
   source:
     repoURL: https://github.com/sawyer523/geektime-devops.git
     targetRevision: HEAD
-    path: week5/yaml2infra
+    path: week5/yaml2infra/cvm
   destination:
     server: https://kubernetes.default.svc
     namespace: yaml2infra
