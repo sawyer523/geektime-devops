@@ -24,7 +24,7 @@ spec:
         }
 
         cpu_core_count = 2
-        memory_size    = 8
+        memory_size    = 4
       }
 
       # Create security group
