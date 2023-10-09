@@ -63,7 +63,7 @@
 ## 使用 CrossPlane + Terraform + Argo CD 实现作业 1 的效果
 
 在 yaml2infra 目录下
-已推送 cvm.yaml 至代码仓库
+已推送 cvm/cvm.yaml 至代码仓库
 1. 安装 terraform provider
     ```shell
     kubectl apply provider.yaml -n crossplane-system
