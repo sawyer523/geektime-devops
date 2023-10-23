@@ -1,0 +1,61 @@
+apiVersion: argoproj.io/v1alpha1
+kind: ApplicationSet
+metadata:
+  name: cluster-git
+spec:
+  goTemplate: true
+  goTemplateOptions: ["missingkey=error"]
+  generators:
+    - matrix:
+        generators:
+          - git:
+              repoURL: https://github.com/argoproj/argo-cd.git
+              revision: HEAD
+              directories:
+                - path: applicationset/examples/matrix/cluster-addons/*
+          - clusters:
+              selector:
+                matchLabels:
+                  argocd.argoproj.io/secret-type: cluster
+  template:
+    metadata:
+      name: '{{.path.basename}}-{{.cluster}}'
+      annotations:
+        # result microservice
+        argocd-image-updater.argoproj.io/result.allow-tags: regexp:^{{path.basename}}
+        argocd-image-updater.argoproj.io/result.helm.image-name: RESULT.IMAGE
+        argocd-image-updater.argoproj.io/result.helm.image-tag: RESULT.TAG
+        argocd-image-updater.argoproj.io/result.pull-secret: pullsecret:argocd/harbor-pull-secret
+        # vote microservice
+        argocd-image-updater.argoproj.io/vote.allow-tags: regexp:^{{path.basename}}
+        argocd-image-updater.argoproj.io/vote.helm.image-name: VOTE.IMAGE
+        argocd-image-updater.argoproj.io/vote.helm.image-tag: VOTE.TAG
+        argocd-image-updater.argoproj.io/vote.pull-secret: pullsecret:argocd/harbor-pull-secret
+        # worker microservice
+        argocd-image-updater.argoproj.io/worker.allow-tags: regexp:^{{path.basename}}
+        argocd-image-updater.argoproj.io/worker.helm.image-name: WORKER.IMAGE
+        argocd-image-updater.argoproj.io/worker.helm.image-tag: WORKER.TAG
+        argocd-image-updater.argoproj.io/worker.pull-secret: pullsecret:argocd/harbor-pull-secret
+        # image list
+        argocd-image-updater.argoproj.io/image-list: result=harbor.wangwei.devopscamp.us/vote/result, vote=harbor.wangwei.devopscamp.us/vote/vote, worker=harbor.wangwei.devopscamp.us/vote/worker
+        argocd-image-updater.argoproj.io/update-strategy: latest
+        argocd-image-updater.argoproj.io/write-back-method: git
+        argocd-image-updater.argoproj.io/git-branch: main
+    spec:
+      project: default
+      source:
+        repoURL: "https://github.com/devops-advanced-camp/vote-helm.git"
+        targetRevision: HEAD
+        path: "demo-5"
+        helm:
+          valueFiles:
+            - "env/{{path.basename}}/values.yaml"
+      destination:
+        server: '{{server}}'
+        namespace: "vote-auto-generator-{{path.basename}}"
+      yncPolicy:
+        automated:
+          prune: true
+          selfHeal: true
+        syncOptions:
+          - CreateNamespace=true
