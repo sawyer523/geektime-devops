@@ -1,0 +1,37 @@
+apiVersion: apps/v1  
+kind: Deployment  
+metadata:
+  name: week9-prometheus-app
+spec:
+  selector:
+    matchLabels:
+      app: week9-prometheus-app
+  template:
+    metadata:
+      labels:
+        app: week9-prometheus-app
+    spec:
+      containers:
+        - name: week9-prometheus-app
+          image: docker.io/lyzhang1999/week9-prometheus-app:custom-bucket
+          ports:
+            - containerPort: 8080
+              name: web
+          readinessProbe:
+            httpGet:
+              path: /api/health
+              port: 8080
+            initialDelaySeconds: 5
+            periodSeconds: 5
+        - name: curl
+          image: docker.io/curlimages/curl
+          command: ["/bin/sh", "-c"]
+          args:
+            - |
+              while true;
+              do
+                curl http://127.0.0.1:8080/api/cart
+                sleep 2
+                curl http://127.0.0.1:8080/api/pay
+                sleep 2
+              done

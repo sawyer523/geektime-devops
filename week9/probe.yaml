@@ -1,0 +1,15 @@
+apiVersion: monitoring.coreos.com/v1
+kind: Probe
+metadata:
+  name: http-probe
+  labels:
+    release: kube-prometheus-stack
+spec:
+  prober:
+    url: blackbox-exporter-prometheus-blackbox-exporter.prometheus:9115
+  module: http_2xx
+  interval: 10s
+  targets:
+    staticConfig:
+      static:
+        - https://www.baidu.com

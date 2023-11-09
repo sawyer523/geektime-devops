@@ -1,0 +1,17 @@
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  labels:
+    release: kube-prometheus-stack
+  name: app-http-latency-alert
+spec:
+  groups:
+    - name: app_http
+      rules:
+        - expr: |
+            histogram_quantile(0.95, sum(rate(http_response_time_seconds_bucket[1m])) by (le)) > 0.3
+          for: 1m
+          alert: High Request Latency
+          annotations:
+            summary:  延时过高告警
+            description: 接口 P95 请求延时高于 300ms，值为 {{ $value }}

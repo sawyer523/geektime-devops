@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: week9-prometheus-app-service
+  labels:
+    app: week9-prometheus-app
+spec:
+  selector:
+    app: week9-prometheus-app
+  ports:
+    - name: web
+      port: 8080
+      targetPort: 8080
+      nodePort: 30901
+  type: NodePort
