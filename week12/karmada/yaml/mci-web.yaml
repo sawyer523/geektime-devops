@@ -1,0 +1,18 @@
+apiVersion: networking.karmada.io/v1alpha1
+kind: MultiClusterIngress
+metadata:
+  name: demo-localhost
+  namespace: default
+spec:
+  ingressClassName: nginx
+  rules:
+    - host: demo.localdev.me
+      http:
+        paths:
+          - backend:
+              service:
+                name: web
+                port:
+                  number: 81
+            path: /web
+            pathType: Prefix
