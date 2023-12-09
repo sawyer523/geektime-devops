@@ -1,0 +1,29 @@
+apiVersion: argoproj.io/v1alpha1
+kind: ApplicationSet
+metadata:
+  name: bookinfo
+  namespace: argocd
+spec:
+  generators:
+    - clusters:
+        selector:
+          matchLabels:
+            use: prod
+  template:
+    metadata:
+      name: '{{name}}-bookinfo' # 'name' field of the Secret
+    spec:
+      project: "default"
+      source:
+        repoURL: https://github.com/sawyer523/geektime-devops.git
+        targetRevision: HEAD
+        path: week14/bookinfo
+      destination:
+        server: '{{server}}' # 'server' field of the secret
+        namespace: default
+      syncPolicy:
+        automated:
+          prune: true
+          selfHeal: true
+        syncOptions:
+          - CreateNamespace=true

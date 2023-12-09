@@ -1,0 +1,39 @@
+apiVersion: tf.upbound.io/v1beta1
+kind: ProviderConfig
+metadata:
+  name: default
+spec:
+  configuration: |
+    provider "tencentcloud" {
+        secret_id  = var.secret_id
+        secret_key = var.secret_key
+        region     = var.region
+    }
+
+    terraform {
+      backend "kubernetes" {
+        secret_suffix     = "providerconfig-default"
+        namespace         = "crossplane-system"
+        in_cluster_config = true
+      }
+    
+      required_version = "> 0.13.0"
+        required_providers {
+        tencentcloud = {
+        source  = "tencentcloudstack/tencentcloud"
+        version = "1.81.5"
+        }
+      }
+    }
+    
+    variable "secret_id" {
+      default = "your secret id"
+    }
+      
+    variable "secret_key" {
+      default = "your secret key"
+    }
+      
+    variable "region" {
+      default = "ap-hongkong"
+    }
